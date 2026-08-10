@@ -1,0 +1,16 @@
+# Declare types
+type adsprpcd_prop, property_type, vendor_property_type, vendor_public_property_type;
+type adsprpc_prop, property_type, vendor_property_type, vendor_public_property_type;
+type adsprpcd_file_type, file_type;
+
+# Rules for Sony camera
+allow priv_app sysfs_kgsl:file { getattr open read };
+allow priv_app adsprpcd_file_type:dir { getattr read search };
+allow priv_app adsprpcd_file_type:file { getattr open read };
+get_prop(priv_app, adsprpcd_prop)
+# Broken
+# allow priv_app default_android_service:service_manager { find };
+get_prop(priv_app, adsprpc_prop)
+allow hal_camera_default sysfs:file { open read write };
+allow priv_app hal_secd_hwservice:hwservice_manager { find };
+allow priv_app hal_secd_default:binder { call };

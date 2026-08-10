@@ -1,0 +1,85 @@
+# Dedicated domain for SemcCameraUI (com.sonyericsson.android.camera).
+#
+# This app talks directly to cacaoserver over binder (see cacaoserver.te) —
+# something AOSP's own reference camera app never does (it goes through
+# cameraserver instead, which gets its own dedicated system-side domain).
+# Scoping that one narrow channel to a domain used by nothing else, rather
+# than opening it to every priv_app/platform_app on the device, follows the
+# same pattern AOSP itself uses for apps with atypical access needs — see
+# system/sepolicy/private/permissioncontroller_app.te and
+# .../mediaprovider_app.te.
+#
+# The rest of this file mirrors platform_app.te's baseline 1:1 (minus the
+# bits explicitly commented there as being for com.android.systemui /
+# com.android.captiveportallogin specifically, and userdebug_or_eng-only
+# tracing hooks), since this app is platform-signed and otherwise needs the
+# same baseline as any other platform_app. If LineageOS's platform_app.te
+# gains new baseline rules later, re-diff this file against it.
+
+type semccamera_app, domain, coredomain;
+
+app_domain(semccamera_app)
+net_domain(semccamera_app)
+bluetooth_domain(semccamera_app)
+
+allow semccamera_app shell_data_file:dir search;
+allow semccamera_app shell_data_file:file { open getattr read };
+allow semccamera_app icon_file:file { open getattr read };
+allow semccamera_app { apk_tmp_file apk_private_tmp_file }:dir rw_dir_perms;
+allow semccamera_app { apk_tmp_file apk_private_tmp_file }:file rw_file_perms;
+allow semccamera_app apk_private_data_file:dir search;
+allow semccamera_app asec_apk_file:dir create_dir_perms;
+allow semccamera_app asec_apk_file:file create_file_perms;
+allow semccamera_app media_rw_data_file:dir create_dir_perms;
+allow semccamera_app media_rw_data_file:file create_file_perms;
+allow semccamera_app cache_file:dir create_dir_perms;
+allow semccamera_app cache_file:file create_file_perms;
+allow semccamera_app mnt_media_rw_file:dir r_dir_perms;
+allow semccamera_app sdcard_type:dir create_dir_perms;
+allow semccamera_app sdcard_type:file create_file_perms;
+allow semccamera_app rootfs:dir getattr;
+
+r_dir_file(semccamera_app, proc_net_type)
+
+allow semccamera_app audioserver_service:service_manager find;
+allow semccamera_app cameraserver_service:service_manager find;
+allow semccamera_app drmserver_service:service_manager find;
+allow semccamera_app mediaserver_service:service_manager find;
+allow semccamera_app mediametrics_service:service_manager find;
+allow semccamera_app mediaextractor_service:service_manager find;
+allow semccamera_app mediadrmserver_service:service_manager find;
+allow semccamera_app persistent_data_block_service:service_manager find;
+allow semccamera_app radio_service:service_manager find;
+allow semccamera_app thermal_service:service_manager find;
+allow semccamera_app app_api_service:service_manager find;
+allow semccamera_app system_api_service:service_manager find;
+allow semccamera_app vr_manager_service:service_manager find;
+allow semccamera_app stats_service:service_manager find;
+allow semccamera_app tradeinmode_service:service_manager find;
+
+binder_call(semccamera_app, statsd)
+
+allow semccamera_app preloads_data_file:file r_file_perms;
+allow semccamera_app preloads_data_file:dir r_dir_perms;
+allow semccamera_app preloads_media_file:file r_file_perms;
+allow semccamera_app preloads_media_file:dir r_dir_perms;
+
+read_runtime_log_tags(semccamera_app)
+
+allow semccamera_app system_server:udp_socket {
+        connect getattr read recvfrom sendto write getopt setopt };
+
+set_prop(semccamera_app, test_boot_reason_prop)
+get_prop(semccamera_app, keyguard_config_prop)
+get_prop(semccamera_app, qemu_hw_prop)
+get_prop(semccamera_app, last_boot_reason_prop)
+
+allow semccamera_app app_data_file:lnk_file create_file_perms;
+
+dontaudit semccamera_app debugfs_tracing:file rw_file_perms;
+
+virtualizationservice_use(semccamera_app)
+
+# ─── cacaoserver access (see cacaoserver.te) ───
+# The actual reason this domain exists — everything above is just the
+# platform_app-equivalent baseline this app also needs.

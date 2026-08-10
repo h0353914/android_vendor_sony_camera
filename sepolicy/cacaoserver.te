@@ -1,0 +1,47 @@
+# cacaoserver — Sony camera "Cacao" backend daemon (/system/bin/cacaoserver)
+#
+# Previously this only ran as a Magisk-launched shell process with no
+# dedicated domain, which is why "allow cacaoserver priv_app:binder" was
+# silently dropped by magiskpolicy (the type didn't exist yet at apply time).
+# Building it as a real init service gives it a real, compiled-in domain.
+type cacaoserver, domain;
+type cacaoserver_exec, exec_type, vendor_file_type, file_type;
+type cacaoserver_service, service_manager_type;
+
+init_daemon_domain(cacaoserver)
+
+# Talk to servicemanager (registers/looked-up as "cacao") and hwservicemanager.
+binder_use(cacaoserver)
+hwbinder_use(cacaoserver)
+add_service(cacaoserver, cacaoserver_service)
+
+# vendor.somc.hardware.camera.provider@1.0::IVendorSomcCameraProvider maps to
+# hal_camera_hwservice (see yoshino-common/sepolicy/vendor/hwservice_contexts),
+# implemented by hal_camera_default.
+hal_client_domain(cacaoserver, hal_camera)
+hal_client_domain(cacaoserver, hal_graphics_allocator)
+
+# vendor.somc.hardware.camera.cacao@3.0/3.1 have no dedicated hwservice_contexts
+# entry and no registered hwservice implementation (they're linked in-process,
+# not looked up via hwservicemanager), so no find rule is needed for them.
+# NOTE: platform neverallow forbids granting find on default_android_hwservice
+# (system/sepolicy/private/domain.te) — do not add that back speculatively.
+allow cacaoserver hal_camera_default:binder call;
+
+allow cacaoserver self:process { setsched };
+allow cacaoserver cameraserver_service:service_manager find;
+
+# Reverse callback path: cacaoserver -> SemcCameraUI and back.
+# This is the rule that used to be dropped under Magisk.
+#
+# Scoped to semccamera_app specifically (see semccamera_app.te), not the
+# broad priv_app/platform_app pool — nothing else on this device should be
+# able to reach cacaoserver's binder interface at all. This also replaces
+# the android.permission.CAMERA runtime-permission check CacaoService used
+# to do in-process (removed: the API it used is not visible to vendor code
+# by AOSP design — see CacaoService.cpp for the full explanation). The
+# dedicated domain is the SELinux-native way to get an equivalent, per-app
+# guarantee back.
+allow semccamera_app cacaoserver_service:service_manager find;
+allow semccamera_app cacaoserver:binder { call transfer };
+allow cacaoserver semccamera_app:binder { call transfer };
