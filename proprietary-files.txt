@@ -1,0 +1,75 @@
+# Camera
+system/etc/permissions/com.sony.device.xml
+system/etc/permissions/com.sonyericsson.idd.xml
+system/etc/permissions/com.sonymobile.getmore.api.xml
+system/etc/permissions/com.sonymobile.securedatamanager.xml
+system/etc/permissions/com.sonymobile.vibrationeffect.xml
+system/etc/permissions/com.sonymobile.camera.addon.api.xml
+system/etc/permissions/com.sonymobile.imageprocessor.bypasscamera.api.xml
+system/etc/permissions/platform-com.sonyericsson.android.camera.xml
+system/etc/permissions/privapp-permissions-com.sonyericsson.android.camera.xml
+system/etc/permissions/privapp-permissions-com.sonyericsson.android.addoncamera.artfilter.xml
+system/etc/permissions/privapp-permissions-com.sonymobile.addoncamera.portraitselfie.xml
+system/etc/default-permissions/com.sonyericsson.android.camera.xml
+system/etc/init/cacaoserver.rc
+system/etc/sysconfig/somc_internal_whitelist.xml
+system/framework/com.sony.device.jar
+system/framework/com.sonyericsson.idd_impl.jar
+system/framework/com.sonymobile.getmore.api.jar
+system/framework/com.sonymobile.securedatamanager_impl.jar
+system/framework/com.sonymobile.vibrationeffect_impl.jar
+system/framework/com.sonymobile.camera.addon.api.jar
+system/framework/com.sonymobile.imageprocessor.bypasscamera.api.jar
+system/bin/cacaoserver
+# libcacao_pal.so lives under cacao/prebuilts/{lib,lib64}/ instead (referenced
+# directly by the cacao/prebuilts/Android.bp module), not under proprietary/.
+system/vendor/lib/libscveObjectTracker.so
+system/vendor/lib/libscveObjectTracker_stub.so
+system/vendor/lib/libscveFaceRecognition.so
+system/vendor/lib/libscveFaceLandmarks.so
+system/vendor/lib/libscvePanorama.so
+system/vendor/lib/libscvePanorama_lite.so
+system/vendor/lib/libscveBlobDescriptor.so
+system/vendor/lib/libscveBlobDescriptor_stub.so
+system/vendor/lib/libscveCommon.so
+system/vendor/lib/libscveCommon_stub.so
+system/vendor/lib/libscveObjectSegmentation.so
+system/vendor/lib/libubifocus.so
+# liboptizoom.so / libchromaflash.so intentionally omitted: already shipped by
+# vendor/sony/yoshino-common as Soong modules, listing them here would just
+# duplicate an install-path conflict.
+system/vendor/lib/libdualcameraddm.so
+system/app/CameraAddonPermission-release/CameraAddonPermission-release.apk
+system/app/CameraExtensionPermission-release/CameraExtensionPermission-release.apk
+system/app/CameraCommonPermission-release/CameraCommonPermission-release.apk
+system/app/ImageProcessorPermission-release/ImageProcessorPermission-release.apk
+system/priv-app/ArtFilterCamera-xxhdpi-release/ArtFilterCamera-xxhdpi-release.apk
+system/priv-app/CameraPanorama-release/CameraPanorama-release.apk
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/com.sonymobile.addoncamera.portraitselfie.apk
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm/libarcsoft_beautyshot.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm/libarcsoft_picselfie_algorithm.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm/libbeauty_picselfie.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm/libmpbase.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm/libpp.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libarcsoft_beautyshot.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libarcsoft_picselfie_algorithm.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libbeauty_picselfie.so
+system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libmpbase.so
+-system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libpp.so
+# SemcCameraUI is now built from source (see SemcCameraUI-xxhdpi/), the stock
+# APK and its arcsoft/handsigns/image_converter/mpbase/libc++_shared.so are
+# superseded. The remaining ML libs below have no available source, so they
+# still come from the stock dump — path renamed priv-app/SemcCameraUI to match
+# the source-built module's install directory.
+system/priv-app/SemcCameraUI/lib/arm64/libdetector.so
+system/priv-app/SemcCameraUI/lib/arm64/libhta.so
+system/priv-app/SemcCameraUI/lib/arm64/libSNPE.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_adsp.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_skel.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_v2.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_skel.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v65_domains_v2_skel.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v66_domains_v2_skel.so
+system/priv-app/SemcCameraUI/lib/arm64/libsnpe-android.so
+system/priv-app/SemcCameraUI/lib/arm64/libsymphony-cpu.so

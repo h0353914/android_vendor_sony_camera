@@ -1,0 +1,151 @@
+// Hand-maintained: base app/jar imports below cover the stock proprietary
+// blobs listed in proprietary-files.txt (extract-files.sh/setup-makefiles.sh
+// used to auto-generate this file from that list; both were removed since
+// this file now also carries hand-added content the tooling never modeled —
+// see cacao/ and SemcCameraUI-xxhdpi/ for the source-built submodules, and
+// the cacaoserver cc_prebuilt_binary below).
+
+soong_namespace {
+    imports: [
+        "vendor/sony/yoshino-common",
+    ],
+}
+
+android_app_import {
+    name: "ArtFilterCamera-xxhdpi-release",
+    owner: "sony",
+    apk: "proprietary/system/priv-app/ArtFilterCamera-xxhdpi-release/ArtFilterCamera-xxhdpi-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+    privileged: true,
+}
+
+android_app_import {
+    name: "CameraPanorama-release",
+    owner: "sony",
+    apk: "proprietary/system/priv-app/CameraPanorama-release/CameraPanorama-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+    privileged: true,
+}
+
+// SemcCameraUI is now built from source, see SemcCameraUI-xxhdpi/Android.bp.
+
+android_app_import {
+    name: "com.sonymobile.addoncamera.portraitselfie",
+    owner: "sony",
+    apk: "proprietary/system/priv-app/com.sonymobile.addoncamera.portraitselfie/com.sonymobile.addoncamera.portraitselfie.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+    privileged: true,
+}
+
+dex_import {
+    name: "com.sony.device",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sony.device.jar"],
+}
+
+dex_import {
+    name: "com.sonyericsson.idd_impl",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonyericsson.idd_impl.jar"],
+}
+
+dex_import {
+    name: "com.sonymobile.getmore.api",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonymobile.getmore.api.jar"],
+}
+
+dex_import {
+    name: "com.sonymobile.securedatamanager_impl",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonymobile.securedatamanager_impl.jar"],
+}
+
+dex_import {
+    name: "com.sonymobile.vibrationeffect_impl",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonymobile.vibrationeffect_impl.jar"],
+}
+
+// ─── cacaoserver deployment (see cacao/ for the source-built libcacao_* libs) ───
+// No source available for these; shipped as-is, same as the magisk module.
+
+dex_import {
+    name: "com.sonymobile.camera.addon.api",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonymobile.camera.addon.api.jar"],
+}
+
+dex_import {
+    name: "com.sonymobile.imageprocessor.bypasscamera.api",
+    owner: "sony",
+    jars: ["proprietary/system/framework/com.sonymobile.imageprocessor.bypasscamera.api.jar"],
+}
+
+android_app_import {
+    name: "CameraAddonPermission-release",
+    owner: "sony",
+    apk: "proprietary/system/app/CameraAddonPermission-release/CameraAddonPermission-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+}
+
+android_app_import {
+    name: "CameraExtensionPermission-release",
+    owner: "sony",
+    apk: "proprietary/system/app/CameraExtensionPermission-release/CameraExtensionPermission-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+}
+
+android_app_import {
+    name: "CameraCommonPermission-release",
+    owner: "sony",
+    apk: "proprietary/system/app/CameraCommonPermission-release/CameraCommonPermission-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+}
+
+android_app_import {
+    name: "ImageProcessorPermission-release",
+    owner: "sony",
+    apk: "proprietary/system/app/ImageProcessorPermission-release/ImageProcessorPermission-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+}
+
+// cacaoserver itself has no available source (only the libcacao_* libs it
+// loads were reconstructed, see cacao/); ships as-is, same blob as stock.
+// init_rc pulls in proprietary/system/etc/init/cacaoserver.rc automatically.
+cc_prebuilt_binary {
+    name: "cacaoserver",
+    owner: "sony",
+    srcs: ["proprietary/system/bin/cacaoserver"],
+    compile_multilib: "32",
+    // Vendor-only: links libcacao_service/libcacao_client (vendor-side
+    // variants) and, transitively, the vendor-only vendor.somc.hardware.
+    // camera.* HIDL prebuilts from yoshino-common.
+    vendor: true,
+    strip: {
+        none: true,
+    },
+    check_elf_files: false,
+    init_rc: ["proprietary/system/etc/init/cacaoserver.rc"],
+}
