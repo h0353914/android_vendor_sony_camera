@@ -1,0 +1,20 @@
+# thermal-engine（yoshino-common 通用溫控 daemon，型別宣告與其餘規則見
+# device/sony/yoshino-common/sepolicy/vendor/thermal-engine.te）需要設定
+# vendor.thermal.camera.kill 等 vendor 屬性（開始/結束錄影時，相機端會等
+# 這個屬性被設定成功），但先前完全沒有 set_prop 或 hwbinder_use，導致
+# property_socket write 被拒絕、hwservicemanager binder call 也被拒絕。
+# 實機測試（test_camera.py 錄影）證實：這個屬性設定失敗會連帶讓 capture
+# request 開始大量 onCaptureFailed，最終讓錄影完全無法啟動。
+#
+# 這兩條規則只跟攝影機有關，所以放在這裡而不是 yoshino-common（那邊留給
+# thermal-engine 本身的通用溫控規則）。
+#
+# [已修正] 一開始直接對 vendor_default_prop 開 set_prop，但那是「未特別
+# 分類的屬性」專用的 catch-all type，AOSP 在 system/sepolicy/private/
+# domain.te 有 neverallow 明確禁止 init/vendor_init 以外的任何 domain 對它
+# set，編譯時被擋下來。正確做法：讓 vendor.thermal.camera. 這個 property
+# 前綴改標成專屬 type，這裡沿用既有的 somc_camera_prop（已經是
+# vendor_public_prop，AOSP 自己的 cameraserver.te 也已經對它有 get_prop），
+# 而不是另外造一個新 type。
+set_prop(thermal-engine, somc_camera_prop)
+hwbinder_use(thermal-engine)

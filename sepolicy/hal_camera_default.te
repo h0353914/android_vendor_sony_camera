@@ -1,0 +1,29 @@
+# Allow hal_camera_default to read sysfs
+allow hal_camera_default sysfs:file r_file_perms;
+
+# Allow hal_camera_default to write to tad socket and connect to tad daemon
+allow hal_camera_default tad:unix_stream_socket connectto;
+allow hal_camera_default tad_socket:sock_file write;
+
+# Allow hal_camera_default to find and call hal_idd_default
+allow hal_camera_default hal_idd_default:binder call;
+allow hal_camera_default hal_idd_hwservice:hwservice_manager find;
+
+# Allow hal_camera_default to access sockets in /dev/socket
+allow hal_camera_default socket_device:sock_file write;
+
+# Allow hal_camera_default to access sysfs_leds
+allow hal_camera_default sysfs_leds:dir r_dir_perms;
+allow hal_camera_default sysfs_leds:file rw_file_perms;
+
+# Allow hal_camera_default to write to custom sysfs camera/ToF nodes
+allow hal_camera_default sysfs_camera:file rw_file_perms;
+
+# hal_camera_default (cammw:client 執行緒) 需要讀取 somc_camera_prop 底下的
+# 屬性（含 vendor.thermal.camera.kill），先前只開了 thermal-engine 的
+# set_prop，沒開這邊的讀取權限，導致 avc: denied { read } on somc_camera_prop
+# 檔案，libc 端也直接回報 property 找不到。實機測試（test_camera.py 錄影）
+# 發現這個讀取失敗跟錄影時 audio HAL 的 camcorder-mic ACDB 查詢失敗
+# （android.hardware.audio.service: Failed to fetch the lookup information
+# of the device 00000004）同時出現，一併修正。
+get_prop(hal_camera_default, somc_camera_prop)
