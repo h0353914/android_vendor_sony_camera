@@ -51,3 +51,8 @@ allow cacaoserver cameraserver_service:service_manager find;
 allow semccamera_app cacaoserver_service:service_manager find;
 allow semccamera_app cacaoserver:binder { call transfer };
 allow cacaoserver semccamera_app:binder { call transfer };
+
+# App passes ashmem buffers (capture frames) to cacaoserver over binder;
+# without this, cacaoserver silently fails to use the received fd and the
+# app's ImageReader crashes with SIGSEGV on the invalid buffer.
+allow cacaoserver semccamera_app:fd use;
