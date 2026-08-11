@@ -56,3 +56,19 @@ allow cacaoserver semccamera_app:binder { call transfer };
 # without this, cacaoserver silently fails to use the received fd and the
 # app's ImageReader crashes with SIGSEGV on the invalid buffer.
 allow cacaoserver semccamera_app:fd use;
+
+# 960fps 超級慢動作(單拍) 專用路徑需要 android.hidl.token::ITokenManager 做
+# buffer token 的跨行程交換（高吞吐量零拷貝共享），先前沒有這條規則，導致
+# 實機測試（超級慢動作單拍）出現：
+#   avc: denied { find } for interface=android.hidl.token::ITokenManager
+#     scontext=u:r:cacaoserver:s0 tcontext=u:object_r:hidl_token_hwservice:s0
+#   cacao: ProcessCtrlGateway.cpp [CAC] Dequeue failed. ret:2 (連續大量噴)
+#   cacao: ProcessCtrlGatewayBase.cpp [CAC] MsgSendRecv error <NotFound>
+# native 端 buffer prepare 永遠失敗，5 秒後 app 端 SuperSlowShotRecorderController
+# 等不到 callback，直接拋出未捕捉例外，整個相機 app crash
+# (FATAL EXCEPTION: CameraAccess / TimeoutException)。
+#
+# 跟 cameraserver.te / mediaserver.te / hal_omx.te 等 AOSP 既有 coredomain
+# 用的是同一條標準寫法（hidl_token_hwservice 本身標成
+# coredomain_hwservice，cacaoserver 已經是 coredomain，模式一致）。
+allow cacaoserver hidl_token_hwservice:hwservice_manager find;
