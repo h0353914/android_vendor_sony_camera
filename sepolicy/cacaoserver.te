@@ -71,7 +71,15 @@ allow semccamera_app cacaoserver:fd use;
 # 以下 denial 被擋，導致 requestBuffer 失敗、dequeueBuffer 提早以失敗碼返回
 # （表面上看起來像是 dequeueBuffer 本身在噴一個奇怪的錯誤碼，實際上是這裡）：
 #   avc: denied { call } for scontext=u:r:cacaoserver:s0 tcontext=u:r:mediacodec:s0 tclass=binder
-allow cacaoserver mediacodec:binder call;
+# `call` 解掉後接著又噴 `transfer`（回覆路徑），一併補上：
+#   avc: denied { transfer } for scontext=u:r:cacaoserver:s0 tcontext=u:r:mediacodec:s0 tclass=binder
+allow cacaoserver mediacodec:binder { call transfer };
+
+# 上面兩條解掉後，換 mediacodec 反向呼叫 cacaoserver（callback/reply 路徑）被擋：
+#   avc: denied { call } for scontext=u:r:mediacodec:s0 tcontext=u:r:cacaoserver:s0 tclass=binder
+# 補上後裝置端動態驗證：一般錄影完整跑完，StopStream/Finish 正常觸發，UI 不再
+# 卡在錄影畫面，錄出來的檔案也不再是 0 bytes。
+allow mediacodec cacaoserver:binder { call transfer };
 
 # 同一次啟動流程也讀不到 /dev/ion（圖形緩衝區記憶體配置的基礎機制），跟
 # cameraserver.te 用同一條標準寫法補齊：
