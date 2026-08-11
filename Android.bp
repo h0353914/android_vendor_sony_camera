@@ -139,10 +139,15 @@ cc_prebuilt_binary {
     owner: "sony",
     srcs: ["proprietary/system/bin/cacaoserver"],
     compile_multilib: "32",
-    // Vendor-only: links libcacao_service/libcacao_client (vendor-side
-    // variants) and, transitively, the vendor-only vendor.somc.hardware.
-    // camera.* HIDL prebuilts from yoshino-common.
-    vendor: true,
+    // System (default): must stay system-side so it links system libbinder
+    // (defaults to /dev/binder) and its registered "cacao" service is
+    // reachable via the app-facing service_manager SemcCameraUI looks in.
+    // Confirmed on-device: as vendor:true it linked vendor libbinder,
+    // defaulted to /dev/vndbinder/vndservicemanager instead, and the app
+    // could never find the service at all (ServiceManagerCppClient timed
+    // out waiting on /dev/binder while cacaoserver had registered on
+    // vndservicemanager). See libcacao_service/Android.bp for how the
+    // vendor-only HIDL dependency is handled instead.
     strip: {
         none: true,
     },

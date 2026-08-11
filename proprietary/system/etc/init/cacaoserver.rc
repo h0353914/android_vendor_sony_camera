@@ -3,7 +3,7 @@
 # cacaoserver.rc
 #
 # Cacao service
-service cacaoserver /vendor/bin/cacaoserver
+service cacaoserver /system/bin/cacaoserver
     class main
     user cameraserver
     group audio camera input drmrpc

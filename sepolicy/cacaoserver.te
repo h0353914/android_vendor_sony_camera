@@ -4,8 +4,14 @@
 # dedicated domain, which is why "allow cacaoserver priv_app:binder" was
 # silently dropped by magiskpolicy (the type didn't exist yet at apply time).
 # Building it as a real init service gives it a real, compiled-in domain.
-type cacaoserver, domain;
-type cacaoserver_exec, exec_type, vendor_file_type, file_type;
+#
+# coredomain: cacaoserver is a system-partition daemon (see Android.bp for
+# why it can't be vendor:true), same pattern as cameraserver.te — a
+# non-coredomain domain can't execute system_file_type at all (full_treble
+# neverallow), and coredomain is what lets a system daemon still reach
+# vendor HALs via hal_client_domain below.
+type cacaoserver, domain, coredomain;
+type cacaoserver_exec, exec_type, system_file_type, file_type;
 type cacaoserver_service, service_manager_type;
 
 init_daemon_domain(cacaoserver)
