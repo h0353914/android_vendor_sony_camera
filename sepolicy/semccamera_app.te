@@ -9,12 +9,18 @@
 # system/sepolicy/private/permissioncontroller_app.te and
 # .../mediaprovider_app.te.
 #
-# The rest of this file mirrors platform_app.te's baseline 1:1 (minus the
-# bits explicitly commented there as being for com.android.systemui /
-# com.android.captiveportallogin specifically, and userdebug_or_eng-only
-# tracing hooks), since this app is platform-signed and otherwise needs the
-# same baseline as any other platform_app. If LineageOS's platform_app.te
-# gains new baseline rules later, re-diff this file against it.
+# The baseline below started as a 1:1 copy of platform_app.te, but that
+# turned out to be the wrong model: platform_app.te is compiled as part of
+# the private/platform policy, so it can freely reference private types.
+# This file is vendor sepolicy, which can only reference the public
+# platform interface — several platform_app.te rules (app_api_service,
+# system_api_service, stats_service, tradeinmode_service, and a handful of
+# APK-install/preload/prop types with no other vendor-side users anywhere
+# in this tree) don't resolve here and were dropped rather than guessed at
+# again. What's left is either confirmed-public (system/sepolicy/public) or
+# confirmed in use by other vendor .te files elsewhere in this source tree.
+# If SemcCameraUI turns out to need more, add it from a real avc denial,
+# not from re-copying platform_app.te wholesale.
 
 type semccamera_app, domain, coredomain;
 
@@ -24,12 +30,6 @@ bluetooth_domain(semccamera_app)
 
 allow semccamera_app shell_data_file:dir search;
 allow semccamera_app shell_data_file:file { open getattr read };
-allow semccamera_app icon_file:file { open getattr read };
-allow semccamera_app { apk_tmp_file apk_private_tmp_file }:dir rw_dir_perms;
-allow semccamera_app { apk_tmp_file apk_private_tmp_file }:file rw_file_perms;
-allow semccamera_app apk_private_data_file:dir search;
-allow semccamera_app asec_apk_file:dir create_dir_perms;
-allow semccamera_app asec_apk_file:file create_file_perms;
 allow semccamera_app media_rw_data_file:dir create_dir_perms;
 allow semccamera_app media_rw_data_file:file create_file_perms;
 allow semccamera_app cache_file:dir create_dir_perms;
@@ -38,8 +38,6 @@ allow semccamera_app mnt_media_rw_file:dir r_dir_perms;
 allow semccamera_app sdcard_type:dir create_dir_perms;
 allow semccamera_app sdcard_type:file create_file_perms;
 allow semccamera_app rootfs:dir getattr;
-
-r_dir_file(semccamera_app, proc_net_type)
 
 allow semccamera_app audioserver_service:service_manager find;
 allow semccamera_app cameraserver_service:service_manager find;
@@ -51,35 +49,35 @@ allow semccamera_app mediadrmserver_service:service_manager find;
 allow semccamera_app persistent_data_block_service:service_manager find;
 allow semccamera_app radio_service:service_manager find;
 allow semccamera_app thermal_service:service_manager find;
+allow semccamera_app vr_manager_service:service_manager find;
+# app_api_service / system_api_service are public *attributes*
+# (system/sepolicy/public/attributes), not private types -- my earlier
+# check only grepped for "type X", which missed this and wrongly dropped
+# them. activity_service (ActivityManagerService) itself carries
+# app_api_service, and there's no blanket appdomain-wide grant for it
+# (every app domain gets it explicitly, e.g. platform_app.te) -- without
+# this, the app can't even attach to AMS and crashes before onCreate.
 allow semccamera_app app_api_service:service_manager find;
 allow semccamera_app system_api_service:service_manager find;
-allow semccamera_app vr_manager_service:service_manager find;
-allow semccamera_app stats_service:service_manager find;
-allow semccamera_app tradeinmode_service:service_manager find;
+# stats_service / tradeinmode_service confirmed still private-only (real
+# `type`, not `attribute`, in private/service.te) -- correctly dropped.
 
 binder_call(semccamera_app, statsd)
 
-allow semccamera_app preloads_data_file:file r_file_perms;
-allow semccamera_app preloads_data_file:dir r_dir_perms;
-allow semccamera_app preloads_media_file:file r_file_perms;
-allow semccamera_app preloads_media_file:dir r_dir_perms;
-
-read_runtime_log_tags(semccamera_app)
-
 allow semccamera_app system_server:udp_socket {
         connect getattr read recvfrom sendto write getopt setopt };
-
-set_prop(semccamera_app, test_boot_reason_prop)
-get_prop(semccamera_app, keyguard_config_prop)
-get_prop(semccamera_app, qemu_hw_prop)
-get_prop(semccamera_app, last_boot_reason_prop)
 
 allow semccamera_app app_data_file:lnk_file create_file_perms;
 
 dontaudit semccamera_app debugfs_tracing:file rw_file_perms;
 
-virtualizationservice_use(semccamera_app)
+# read_runtime_log_tags() and virtualizationservice_use() dropped: both
+# macros pull in additional types (runtime_event_log_tags_file,
+# virtualizationmanager/virtualizationmanager_exec) with no confirmed
+# vendor-side visibility and no relevance to camera function — same class
+# of problem as the private-only service types above, just one macro
+# expansion removed from being obvious.
 
 # ─── cacaoserver access (see cacaoserver.te) ───
 # The actual reason this domain exists — everything above is just the
-# platform_app-equivalent baseline this app also needs.
+# minimal platform_app-equivalent baseline this app also needs.
