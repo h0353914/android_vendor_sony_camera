@@ -57,6 +57,28 @@ allow cacaoserver semccamera_app:binder { call transfer };
 # app's ImageReader crashes with SIGSEGV on the invalid buffer.
 allow cacaoserver semccamera_app:fd use;
 
+# Reverse direction of the above: cacaoserver also passes fds back to the
+# app (e.g. the video-recording input Surface's producer side is set up by
+# cacaoserver and handed back). Without this, ordinary (non-slow-motion)
+# video recording never gets past its first buffer dequeue/request cycle:
+#   avc: denied { use } for path="/dev/ashmem..." scontext=u:r:semccamera_app:s0
+#     tcontext=u:r:cacaoserver:s0 tclass=fd
+allow semccamera_app cacaoserver:fd use;
+
+# 20260812 動態驗證確認：一般錄影（非慢動作）啟動時，Surface::dequeueBuffer()
+# 內部在第一次拿到 BUFFER_NEEDS_REALLOCATION/RELEASE_ALL_BUFFERS 旗標後會呼叫
+# IGraphicBufferProducer::requestBuffer() 去實際要buffer；這個 binder call 因
+# 以下 denial 被擋，導致 requestBuffer 失敗、dequeueBuffer 提早以失敗碼返回
+# （表面上看起來像是 dequeueBuffer 本身在噴一個奇怪的錯誤碼，實際上是這裡）：
+#   avc: denied { call } for scontext=u:r:cacaoserver:s0 tcontext=u:r:mediacodec:s0 tclass=binder
+allow cacaoserver mediacodec:binder call;
+
+# 同一次啟動流程也讀不到 /dev/ion（圖形緩衝區記憶體配置的基礎機制），跟
+# cameraserver.te 用同一條標準寫法補齊：
+#   avc: denied { read } for name="ion" dev="tmpfs" scontext=u:r:cacaoserver:s0
+#     tcontext=u:object_r:ion_device:s0 tclass=chr_file
+allow cacaoserver ion_device:chr_file rw_file_perms;
+
 # 960fps 超級慢動作(單拍) 專用路徑需要 android.hidl.token::ITokenManager 做
 # buffer token 的跨行程交換（高吞吐量零拷貝共享），先前沒有這條規則，導致
 # 實機測試（超級慢動作單拍）出現：
