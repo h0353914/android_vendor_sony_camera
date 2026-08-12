@@ -102,3 +102,49 @@ allow cacaoserver ion_device:chr_file rw_file_perms;
 # 用的是同一條標準寫法（hidl_token_hwservice 本身標成
 # coredomain_hwservice，cacaoserver 已經是 coredomain，模式一致）。
 allow cacaoserver hidl_token_hwservice:hwservice_manager find;
+
+# 20260812：對照原廠 stock 韌體（同平台 "lilac" 裝置）反解出來的完整
+# cacaoserver sepolicy（vendor_sepolicy.cil），補上我們這邊還缺的規則。
+# mediacodec binder call/transfer 那兩條先前已經靠裝置端 denial 動態驗證
+# 補過，跟原廠規則逐字對上；以下是原廠有、但我們這邊還沒補的部分，用來
+# 排查慢動作(120fps)「無法啟動相機」的問題：
+
+# mediacodec <-> cacaoserver 的 fd 傳遞（兩個方向），原廠規則兩個方向都有：
+#   (allow cacaoserver mediacodec (fd (use)))
+#   (allow mediacodec cacaoserver (fd (use)))
+allow cacaoserver mediacodec:fd use;
+allow mediacodec cacaoserver:fd use;
+
+# hal_client_domain(cacaoserver, hal_graphics_allocator) 只給了 hwbinder
+# find/call，沒有給 fd use；原廠額外補了這條：
+#   (allow cacaoserver hal_graphics_allocator_default (fd (use)))
+allow cacaoserver hal_graphics_allocator_default:fd use;
+
+# 原廠額外對 graphics mapper hwservice 開了 find（我們完全沒有這條）：
+#   (allow cacaoserver hal_graphics_mapper_hwservice_32_0 (hwservice_manager (find)))
+allow cacaoserver hal_graphics_mapper_hwservice:hwservice_manager find;
+
+# 原廠對 permission_service 開了 service_manager find（我們完全沒有）：
+#   (allow cacaoserver permission_service_32_0 (service_manager (find)))
+allow cacaoserver permission_service:service_manager find;
+
+# 原廠額外給了 same_process_hal_file 執行/讀取權限（我們完全沒有）。這是
+# passthrough/same-process HAL .so 的檔案類型，慢動作模式「無法啟動相機」
+# 這種通用啟動失敗訊息，很可能就是卡在載入某個 same-process HAL 函式庫：
+#   (allow cacaoserver same_process_hal_file_32_0
+#     (file (ioctl read getattr lock map execute open watch watch_reads)))
+allow cacaoserver same_process_hal_file:file { ioctl read getattr lock map execute open };
+
+# 補完上面五條後，慢動作(120fps)裝置端實測往前推進（真的錄到影片，檔案從
+# 446KB 長到 1.85MB），但接著又冒出一條原本比對清單漏掉的 denial：
+#   avc: denied { call } for scontext=u:r:cacaoserver:s0 tcontext=u:r:mediaserver:s0 tclass=binder
+# 原廠規則本來就有 mediaserver 這個方向（call/transfer + fd use 都是雙向），
+# 一併補齊：
+#   (allow cacaoserver mediaserver_32_0 (binder (call transfer)))
+#   (allow mediaserver_32_0 cacaoserver (binder (transfer)))
+#   (allow cacaoserver mediaserver_32_0 (fd (use)))
+#   (allow mediaserver_32_0 cacaoserver (fd (use)))
+allow cacaoserver mediaserver:binder { call transfer };
+allow mediaserver cacaoserver:binder { call transfer };
+allow cacaoserver mediaserver:fd use;
+allow mediaserver cacaoserver:fd use;
