@@ -27,3 +27,11 @@ allow hal_camera_default sysfs_camera:file rw_file_perms;
 # （android.hardware.audio.service: Failed to fetch the lookup information
 # of the device 00000004）同時出現，一併修正。
 get_prop(hal_camera_default, somc_camera_prop)
+
+# 20260812：測試 960fps 超級慢動作(連續)時裝置端實測發現：
+#   avc: denied { find } for interface=android.hardware.configstore::ISurfaceFlingerConfigs
+#     scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:hal_configstore_ISurfaceFlingerConfigs:s0
+# 錄影一開始（按下快門後）就失敗，「無法啟動相機」。跟 mediaserver.te /
+# surfaceflinger.te / system_server.te 等 AOSP 既有 coredomain 用同一條
+# 標準寫法補上（hal_client_domain 巨集本身就是 find+call 這組合）。
+hal_client_domain(hal_camera_default, hal_configstore)
