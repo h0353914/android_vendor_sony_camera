@@ -46,6 +46,39 @@ android_app_import {
     privileged: true,
 }
 
+// SomcMovieCreator — 120fps HFR 慢動作錄影結束後的「套用/取消」剪輯畫面
+// (com.sonymobile.moviecreator.intent.action.TIMESHIFT_VIDEO_EDITOR，見
+// ApplicationLauncher.launchVideoEditor())就是由這個 app 提供的獨立
+// Activity，不是 SemcCameraUI 自己的畫面。原本沒有把它加進建置，導致
+// launchVideoEditor() 的 isActivityAvailable() 檢查失敗、回傳 false，但呼叫端
+// （StateMachine.java handleDialogClosed()）完全沒有檢查回傳值，相機因此卡在
+// 120fps StreamingA 高速串流模式，最終被 cammw::CameraIsp::handleTimeout()
+// 的 4 秒逾時 watchdog 判定 CAMMW_CAMERA_EVENT_ESD，一路傳到 app 端變成
+// CameraAccessException(CAMERA_ERROR)。裝置端實測確認：補上這兩個 app 後
+// 套用/取消畫面正常顯示，ESD ERROR 消失。
+android_app_import {
+    name: "SomcMovieCreator-release",
+    owner: "sony",
+    apk: "proprietary/system/priv-app/SomcMovieCreator-release/SomcMovieCreator-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+    privileged: true,
+}
+
+// SomcMovieCreatorRmm — MovieCreator 的隨附元件，原廠韌體裝在 /system/app
+// (非 priv-app)，一併補上以維持跟原廠一致。
+android_app_import {
+    name: "SomcMovieCreatorRmm-release",
+    owner: "sony",
+    apk: "proprietary/system/app/SomcMovieCreatorRmm-release/SomcMovieCreatorRmm-release.apk",
+    certificate: "platform",
+    dex_preopt: {
+        enabled: false,
+    },
+}
+
 dex_import {
     name: "com.sony.device",
     owner: "sony",

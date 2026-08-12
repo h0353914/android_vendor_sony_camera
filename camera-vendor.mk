@@ -73,6 +73,8 @@ PRODUCT_PACKAGES += \
     ArtFilterCamera-xxhdpi-release \
     CameraPanorama-release \
     SemcCameraUI \
+    SomcMovieCreator-release \
+    SomcMovieCreatorRmm-release \
     com.sonymobile.addoncamera.portraitselfie \
     com.sony.device \
     com.sonyericsson.idd_impl \
