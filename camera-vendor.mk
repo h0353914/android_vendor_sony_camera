@@ -7,15 +7,6 @@
 PRODUCT_SOONG_NAMESPACES += \
     vendor/sony/camera
 
-# TODO: the raw .so entries below (portraitselfie/SemcCameraUI JNI libs, no
-# source available) are installed via PRODUCT_COPY_FILES + the
-# BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES escape hatch in
-# BoardConfigVendor.mk. The proper fix (per the "found ELF prebuilt in
-# PRODUCT_COPY_FILES" build warning) is to wrap each one as its own
-# cc_prebuilt_library_shared in Android.bp — like cacao/prebuilts/Android.bp
-# already does for libcacao_pal — and drop the BUILD_BROKEN flag once none
-# are left. Left as PRODUCT_COPY_FILES for now to match how this repo already
-# handled the pre-existing (non-cacao) blobs; revisit if it becomes an issue.
 PRODUCT_COPY_FILES += \
     vendor/sony/camera/proprietary/system/etc/permissions/com.sony.device.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.sony.device.xml \
     vendor/sony/camera/proprietary/system/etc/permissions/com.sonyericsson.idd.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.sonyericsson.idd.xml \
@@ -36,18 +27,6 @@ PRODUCT_COPY_FILES += \
     vendor/sony/camera/proprietary/system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libbeauty_picselfie.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libbeauty_picselfie.so \
     vendor/sony/camera/proprietary/system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libmpbase.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libmpbase.so \
     vendor/sony/camera/proprietary/system/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libpp.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/com.sonymobile.addoncamera.portraitselfie/lib/arm64/libpp.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libdetector.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libdetector.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libhta.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libhta.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libSNPE.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libSNPE.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_adsp.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_adsp.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_skel.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_skel.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_v2.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_domains_v2.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_skel.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_skel.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v65_domains_v2_skel.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v65_domains_v2_skel.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v66_domains_v2_skel.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe_dsp_v66_domains_v2_skel.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsnpe-android.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsnpe-android.so \
-    vendor/sony/camera/proprietary/system/priv-app/SemcCameraUI/lib/arm64/libsymphony-cpu.so:$(TARGET_COPY_OUT_SYSTEM)/priv-app/SemcCameraUI/lib/arm64/libsymphony-cpu.so \
     vendor/sony/camera/proprietary/system/etc/permissions/com.sonymobile.camera.addon.api.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.sonymobile.camera.addon.api.xml \
     vendor/sony/camera/proprietary/system/etc/permissions/com.sonymobile.imageprocessor.bypasscamera.api.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.sonymobile.imageprocessor.bypasscamera.api.xml \
     vendor/sony/camera/proprietary/system/etc/permissions/privapp-permissions-com.sonyericsson.android.addoncamera.artfilter.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-com.sonyericsson.android.addoncamera.artfilter.xml \
