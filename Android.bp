@@ -35,16 +35,12 @@ android_app_import {
 
 // SemcCameraUI is now built from source, see SemcCameraUI-xxhdpi/Android.bp.
 
-android_app_import {
-    name: "com.sonymobile.addoncamera.portraitselfie",
-    owner: "sony",
-    apk: "proprietary/system/priv-app/com.sonymobile.addoncamera.portraitselfie/com.sonymobile.addoncamera.portraitselfie.apk",
-    certificate: "platform",
-    dex_preopt: {
-        enabled: false,
-    },
-    privileged: true,
-}
+// com.sonymobile.addoncamera.portraitselfie（人像自拍外掛）移除：比對
+// /home/h/tmp/extracted 下 poplar（這個裝置真正的原機）的 stock 韌體解包，
+// 完全沒有這個 app 或它的 native libs，證明它不屬於這台裝置的原廠韌體、
+// 是從別的機型混進來的，不應該留在這個 repo。順帶讓
+// BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES（BoardConfigVendor.mk）可以
+// 整條拿掉——它就是靠這個 app 的 5 個 priv-app native libs 撐著的。
 
 // SomcMovieCreator — 120fps HFR 慢動作錄影結束後的「套用/取消」剪輯畫面
 // (com.sonymobile.moviecreator.intent.action.TIMESHIFT_VIDEO_EDITOR，見
@@ -186,4 +182,351 @@ cc_prebuilt_binary {
     },
     check_elf_files: false,
     init_rc: ["proprietary/system/etc/init/cacaoserver.rc"],
+}
+
+// ─── vendor/lib camera vision libs (SCVE/ubifocus/dualcameraddm) ───
+// Converted from PRODUCT_COPY_FILES to real prebuilt modules so
+// check-elf-prebuilt-product-copy-files can run on this tree (see the note
+// in BoardConfigVendor.mk). shared_libs below come from `readelf -d` on the
+// shipped blobs; the upstream libs they resolve to (libfastcvopt,
+// libmmcamera_faceproc[2], libadsprpc, libOpenCL) are already Soong modules
+// in vendor/sony/yoshino-common, imported via the soong_namespace above.
+
+cc_prebuilt_library_shared {
+    name: "libscveCommon_stub",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveCommon_stub.so"],
+            shared_libs: [
+                "libadsprpc",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveCommon",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveCommon.so"],
+            shared_libs: [
+                "liblog",
+                "libion",
+                "libscveCommon_stub",
+                "libadsprpc",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveObjectSegmentation",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveObjectSegmentation.so"],
+            shared_libs: [
+                "libOpenCL",
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveBlobDescriptor",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveBlobDescriptor.so"],
+            shared_libs: [
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveBlobDescriptor_stub",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveBlobDescriptor_stub.so"],
+            shared_libs: [
+                "liblog",
+                "libadsprpc",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveFaceLandmarks",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveFaceLandmarks.so"],
+            shared_libs: [
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libmmcamera_faceproc",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveFaceRecognition",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveFaceRecognition.so"],
+            shared_libs: [
+                "libmmcamera_faceproc2",
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveObjectTracker",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveObjectTracker.so"],
+            shared_libs: [
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libscveObjectSegmentation",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscveObjectTracker_stub",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscveObjectTracker_stub.so"],
+            shared_libs: [
+                "libfastcvopt",
+                "liblog",
+                "libscveCommon",
+                "libadsprpc",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscvePanorama",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscvePanorama.so"],
+            shared_libs: [
+                "libjpeg",
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libscveBlobDescriptor",
+                "libOpenCL",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+cc_prebuilt_library_shared {
+    name: "libscvePanorama_lite",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libscvePanorama_lite.so"],
+            shared_libs: [
+                "libjpeg",
+                "liblog",
+                "libfastcvopt",
+                "libscveCommon",
+                "libscveBlobDescriptor",
+                "libc++",
+                "libc",
+                "libm",
+                "libdl",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+}
+
+// libubifocus.so and libdualcameraddm.so DT_NEED the literal soname
+// "libstdc++.so", which has no vendor-image Soong variant (only the core
+// "libstdc++" and the differently-sonamed "libstdc++_vendor" exist) — no
+// module can be listed in shared_libs that would actually satisfy
+// check_elf_files here, so it's disabled for just these two, same as
+// cacaoserver above. This isn't a regression: raw PRODUCT_COPY_FILES never
+// checked this dependency either, so on-device resolution is unchanged.
+
+cc_prebuilt_library_shared {
+    name: "libubifocus",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libubifocus.so"],
+            shared_libs: [
+                "liblog",
+                "libdl",
+                "libz",
+                "libc",
+                "libm",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+    check_elf_files: false,
+}
+
+cc_prebuilt_library_shared {
+    name: "libdualcameraddm",
+    owner: "sony",
+    strip: {
+        none: true,
+    },
+    target: {
+        android_arm: {
+            srcs: ["proprietary/system/vendor/lib/libdualcameraddm.so"],
+            shared_libs: [
+                "libz",
+                "libdl",
+                "liblog",
+                "libm",
+                "libc",
+            ],
+        },
+    },
+    compile_multilib: "32",
+    prefer: true,
+    soc_specific: true,
+    check_elf_files: false,
 }
