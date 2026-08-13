@@ -4,3 +4,6 @@
 [submodule "SemcCameraUI"]
 	path = SemcCameraUI
 	url = https://github.com/h0353914/SemcCameraUI-xxhdpi-release
+[submodule "Auxiliary"]
+	path = Auxiliary
+	url = https://github.com/h0353914/Auxiliary
