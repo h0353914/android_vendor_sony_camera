@@ -2,8 +2,8 @@
 // blobs listed in proprietary-files.txt (extract-files.sh/setup-makefiles.sh
 // used to auto-generate this file from that list; both were removed since
 // this file now also carries hand-added content the tooling never modeled —
-// see cacao/ and SemcCameraUI-xxhdpi/ for the source-built submodules, and
-// the cacaoserver cc_prebuilt_binary below).
+// see cacao/, CameraPanorama/, and SemcCameraUI-xxhdpi/ for the source-built
+// submodules, and the cacaoserver cc_prebuilt_binary below).
 
 soong_namespace {
     imports: [
@@ -22,16 +22,7 @@ android_app_import {
     privileged: true,
 }
 
-android_app_import {
-    name: "CameraPanorama-release",
-    owner: "sony",
-    apk: "proprietary/system/priv-app/CameraPanorama-release/CameraPanorama-release.apk",
-    certificate: "platform",
-    dex_preopt: {
-        enabled: false,
-    },
-    privileged: true,
-}
+// CameraPanorama is now built from source, see CameraPanorama/Android.bp.
 
 // SemcCameraUI is now built from source, see SemcCameraUI-xxhdpi/Android.bp.
 

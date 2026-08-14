@@ -1,6 +1,6 @@
 # vendor_sony_camera
 
-Prebuilt stock Sony Camera for msm8998 devices (maple and maple_dsds) to include in custom ROM builds.
+Sony Camera stack for the msm8998 `poplar` (Xperia XZ2) family, for inclusion in custom ROM builds. `SemcCameraUI`, `CameraPanorama` and `cacao` (Libcacao) are reconstructed from decompiled sources and built from source as submodules; `proprietary/` still carries the remaining stock blobs for pieces with no available source (ML/vision libs, addon permission APKs, etc.).
 
 ### How to use?
 

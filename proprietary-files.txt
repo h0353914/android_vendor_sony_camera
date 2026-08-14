@@ -38,5 +38,4 @@ system/app/CameraExtensionPermission-release/CameraExtensionPermission-release.a
 system/app/CameraCommonPermission-release/CameraCommonPermission-release.apk
 system/app/ImageProcessorPermission-release/ImageProcessorPermission-release.apk
 system/priv-app/ArtFilterCamera-xxhdpi-release/ArtFilterCamera-xxhdpi-release.apk
-system/priv-app/CameraPanorama-release/CameraPanorama-release.apk
 system/priv-app/SomcMovieCreator-release/SomcMovieCreator-release.apk

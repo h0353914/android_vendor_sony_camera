@@ -7,3 +7,7 @@
 [submodule "Auxiliary"]
 	path = Auxiliary
 	url = https://github.com/h0353914/Auxiliary
+[submodule "CameraPanorama"]
+	path = CameraPanorama
+	url = https://github.com/h0353914/CameraPanorama-release
+	branch = java-2.3.1.B.0.6-a15
