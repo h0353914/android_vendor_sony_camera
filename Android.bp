@@ -2,7 +2,7 @@
 // blobs listed in proprietary-files.txt (extract-files.sh/setup-makefiles.sh
 // used to auto-generate this file from that list; both were removed since
 // this file now also carries hand-added content the tooling never modeled —
-// see cacao/, CameraPanorama/, and SemcCameraUI-xxhdpi/ for the source-built
+// see cacao/ and apps/{CameraPanorama,SemcCameraUI}/ for the source-built
 // submodules, and the cacaoserver cc_prebuilt_binary below).
 
 soong_namespace {
@@ -22,9 +22,9 @@ android_app_import {
     privileged: true,
 }
 
-// CameraPanorama is now built from source, see CameraPanorama/Android.bp.
+// CameraPanorama is now built from source, see apps/CameraPanorama/Android.bp.
 
-// SemcCameraUI is now built from source, see SemcCameraUI-xxhdpi/Android.bp.
+// SemcCameraUI is now built from source, see apps/SemcCameraUI/Android.bp.
 
 // com.sonymobile.addoncamera.portraitselfie（人像自拍外掛）移除：比對
 // /home/h/tmp/extracted 下 poplar（這個裝置真正的原機）的 stock 韌體解包，

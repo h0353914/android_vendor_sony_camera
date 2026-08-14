@@ -2,7 +2,7 @@
 # proprietary-files.txt (extract-files.sh/setup-makefiles.sh used to
 # auto-generate this file from that list; both were removed since this file
 # now also carries hand-added content the tooling never modeled — see
-# cacao/, SemcCameraUI-xxhdpi/, and the cacaoserver-related entries below).
+# cacao/, apps/SemcCameraUI/, and the cacaoserver-related entries below).
 
 PRODUCT_SOONG_NAMESPACES += \
     vendor/sony/camera
