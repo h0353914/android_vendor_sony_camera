@@ -63,18 +63,6 @@ android_app_import {
     privileged: true,
 }
 
-// SomcMovieCreatorRmm — MovieCreator 的隨附元件，原廠韌體裝在 /system/app
-// (非 priv-app)，一併補上以維持跟原廠一致。
-android_app_import {
-    name: "SomcMovieCreatorRmm-release",
-    owner: "sony",
-    apk: "proprietary/system/app/SomcMovieCreatorRmm-release/SomcMovieCreatorRmm-release.apk",
-    certificate: "platform",
-    dex_preopt: {
-        enabled: false,
-    },
-}
-
 dex_import {
     name: "com.sony.device",
     owner: "sony",

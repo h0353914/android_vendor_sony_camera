@@ -33,7 +33,6 @@ PRODUCT_PACKAGES += \
     CameraPanorama-release \
     SemcCameraUI-xxhdpi-release \
     SomcMovieCreator-release \
-    SomcMovieCreatorRmm-release \
     com.sony.device \
     com.sonyericsson.idd_impl \
     com.sonymobile.getmore.api \
