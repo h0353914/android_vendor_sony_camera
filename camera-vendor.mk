@@ -20,7 +20,8 @@ PRODUCT_COPY_FILES += \
     vendor/sony/camera/proprietary/system/etc/permissions/com.sonymobile.imageprocessor.bypasscamera.api.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.sonymobile.imageprocessor.bypasscamera.api.xml \
     vendor/sony/camera/proprietary/system/etc/permissions/privapp-permissions-com.sonyericsson.android.addoncamera.artfilter.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-com.sonyericsson.android.addoncamera.artfilter.xml \
     vendor/sony/camera/proprietary/system/etc/permissions/privapp-permissions-com.sonymobile.moviecreator.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-com.sonymobile.moviecreator.xml \
-    vendor/sony/camera/proprietary/system/etc/default-permissions/com.sonyericsson.android.camera.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/default-permissions/com.sonyericsson.android.camera.xml
+    vendor/sony/camera/proprietary/system/etc/default-permissions/com.sonyericsson.android.camera.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/default-permissions/com.sonyericsson.android.camera.xml \
+    vendor/sony/camera/proprietary/system/etc/default-permissions/com.sonyericsson.android.camera3d.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/default-permissions/com.sonyericsson.android.camera3d.xml
 # liboptizoom.so and libchromaflash.so are already provided as Soong modules by
 # vendor/sony/yoshino-common (yoshino-common-vendor.mk), so they're omitted
 # here to avoid a duplicate-install conflict at the same target path.
