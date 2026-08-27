@@ -51,6 +51,7 @@ PRODUCT_PACKAGES += \
     libcacao_client \
     libcacao_service \
     libcacao_process_ctrl_gateway \
+    libcammw_util \
     libimageprocessorjni \
     libhidltransport:32 \
     libscveObjectTracker \
