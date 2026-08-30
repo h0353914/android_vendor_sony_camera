@@ -11,17 +11,6 @@ soong_namespace {
     ],
 }
 
-android_app_import {
-    name: "ArtFilterCamera-xxhdpi-release",
-    owner: "sony",
-    apk: "proprietary/system/priv-app/ArtFilterCamera-xxhdpi-release/ArtFilterCamera-xxhdpi-release.apk",
-    certificate: "platform",
-    dex_preopt: {
-        enabled: false,
-    },
-    privileged: true,
-}
-
 // CameraPanorama is now built from source, see apps/CameraPanorama/Android.bp.
 
 // SemcCameraUI is now built from source, see apps/SemcCameraUI/Android.bp.
