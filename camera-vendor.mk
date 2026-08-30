@@ -31,7 +31,6 @@ PRODUCT_COPY_FILES += \
 # PRODUCT_PACKAGES below.
 
 PRODUCT_PACKAGES += \
-    ArtFilterCamera-xxhdpi-release \
     CameraPanorama-release \
     SemcCameraUI-xxhdpi-release \
     SomcMovieCreator-release \
