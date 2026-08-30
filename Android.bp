@@ -1,37 +1,9 @@
-// Hand-maintained: base app/jar imports below cover the stock proprietary
-// blobs listed in proprietary-files.txt (extract-files.sh/setup-makefiles.sh
-// used to auto-generate this file from that list; both were removed since
-// this file now also carries hand-added content the tooling never modeled —
-// see cacao/ and apps/{CameraPanorama,SemcCameraUI}/ for the source-built
-// submodules, and the cacaoserver cc_prebuilt_binary below).
-
 soong_namespace {
     imports: [
         "vendor/sony/yoshino-common",
     ],
 }
 
-// CameraPanorama is now built from source, see apps/CameraPanorama/Android.bp.
-
-// SemcCameraUI is now built from source, see apps/SemcCameraUI/Android.bp.
-
-// com.sonymobile.addoncamera.portraitselfie（人像自拍外掛）移除：比對
-// /home/h/tmp/extracted 下 poplar（這個裝置真正的原機）的 stock 韌體解包，
-// 完全沒有這個 app 或它的 native libs，證明它不屬於這台裝置的原廠韌體、
-// 是從別的機型混進來的，不應該留在這個 repo。順帶讓
-// BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES（BoardConfigVendor.mk）可以
-// 整條拿掉——它就是靠這個 app 的 5 個 priv-app native libs 撐著的。
-
-// SomcMovieCreator — 120fps HFR 慢動作錄影結束後的「套用/取消」剪輯畫面
-// (com.sonymobile.moviecreator.intent.action.TIMESHIFT_VIDEO_EDITOR，見
-// ApplicationLauncher.launchVideoEditor())就是由這個 app 提供的獨立
-// Activity，不是 SemcCameraUI 自己的畫面。原本沒有把它加進建置，導致
-// launchVideoEditor() 的 isActivityAvailable() 檢查失敗、回傳 false，但呼叫端
-// （StateMachine.java handleDialogClosed()）完全沒有檢查回傳值，相機因此卡在
-// 120fps StreamingA 高速串流模式，最終被 cammw::CameraIsp::handleTimeout()
-// 的 4 秒逾時 watchdog 判定 CAMMW_CAMERA_EVENT_ESD，一路傳到 app 端變成
-// CameraAccessException(CAMERA_ERROR)。裝置端實測確認：補上這兩個 app 後
-// 套用/取消畫面正常顯示，ESD ERROR 消失。
 android_app_import {
     name: "SomcMovieCreator-release",
     owner: "sony",
@@ -73,8 +45,6 @@ dex_import {
     jars: ["proprietary/system/framework/com.sonymobile.vibrationeffect_impl.jar"],
 }
 
-// ─── cacaoserver deployment (see cacao/ for the source-built libcacao_* libs) ───
-// No source available for these; shipped as-is, same as the magisk module.
 
 dex_import {
     name: "com.sonymobile.camera.addon.api",
@@ -128,37 +98,18 @@ android_app_import {
     },
 }
 
-// cacaoserver itself has no available source (only the libcacao_* libs it
-// loads were reconstructed, see cacao/); ships as-is, same blob as stock.
-// init_rc pulls in proprietary/system/etc/init/cacaoserver.rc automatically.
 cc_prebuilt_binary {
     name: "cacaoserver",
     owner: "sony",
     srcs: ["proprietary/system/bin/cacaoserver"],
     compile_multilib: "32",
-    // System (default): must stay system-side so it links system libbinder
-    // (defaults to /dev/binder) and its registered "cacao" service is
-    // reachable via the app-facing service_manager SemcCameraUI looks in.
-    // Confirmed on-device: as vendor:true it linked vendor libbinder,
-    // defaulted to /dev/vndbinder/vndservicemanager instead, and the app
-    // could never find the service at all (ServiceManagerCppClient timed
-    // out waiting on /dev/binder while cacaoserver had registered on
-    // vndservicemanager). See libcacao_service/Android.bp for how the
-    // vendor-only HIDL dependency is handled instead.
+
     strip: {
         none: true,
     },
     check_elf_files: false,
     init_rc: ["proprietary/system/etc/init/cacaoserver.rc"],
 }
-
-// ─── vendor/lib camera vision libs (SCVE/ubifocus/dualcameraddm) ───
-// Converted from PRODUCT_COPY_FILES to real prebuilt modules so
-// check-elf-prebuilt-product-copy-files can run on this tree (see the note
-// in BoardConfigVendor.mk). shared_libs below come from `readelf -d` on the
-// shipped blobs; the upstream libs they resolve to (libfastcvopt,
-// libmmcamera_faceproc[2], libadsprpc, libOpenCL) are already Soong modules
-// in vendor/sony/yoshino-common, imported via the soong_namespace above.
 
 cc_prebuilt_library_shared {
     name: "libscveCommon_stub",
@@ -442,14 +393,6 @@ cc_prebuilt_library_shared {
     prefer: true,
     soc_specific: true,
 }
-
-// libubifocus.so and libdualcameraddm.so DT_NEED the literal soname
-// "libstdc++.so", which has no vendor-image Soong variant (only the core
-// "libstdc++" and the differently-sonamed "libstdc++_vendor" exist) — no
-// module can be listed in shared_libs that would actually satisfy
-// check_elf_files here, so it's disabled for just these two, same as
-// cacaoserver above. This isn't a regression: raw PRODUCT_COPY_FILES never
-// checked this dependency either, so on-device resolution is unchanged.
 
 cc_prebuilt_library_shared {
     name: "libubifocus",
