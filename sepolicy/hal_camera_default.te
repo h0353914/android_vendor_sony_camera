@@ -35,3 +35,11 @@ get_prop(hal_camera_default, somc_camera_prop)
 # surfaceflinger.te / system_server.te 等 AOSP 既有 coredomain 用同一條
 # 標準寫法補上（hal_client_domain 巨集本身就是 find+call 這組合）。
 hal_client_domain(hal_camera_default, hal_configstore)
+
+# 20260902：實機測試 app-scan3d 掃描流程時發現相機預覽全黑，logcat 顯示：
+#   avc: denied { find } for interface=android.hardware.graphics.allocator.IAllocator/default
+#     scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:hal_graphics_allocator_service:s0
+# hal_camera.te 裡標準只開了 hal_graphics_allocator:fd use（沿用既有 fd），
+# 沒開 find+call（自己主動找/呼叫這個 HAL service）；跟上面 hal_configstore
+# 同一種缺口，補上標準巨集。
+hal_client_domain(hal_camera_default, hal_graphics_allocator)

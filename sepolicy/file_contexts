@@ -1,1 +1,11 @@
 /system/bin/cacaoserver    u:object_r:cacaoserver_exec:s0
+
+# 20260902：實機測試 app-scan3d 掃描流程時發現相機預覽全黑，logcat 顯示：
+#   avc: denied { read write } for name="i2c-8" ...
+#     scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:device:s0 tclass=chr_file
+# 這台裝置上 /dev/i2c-8 是相機鏡頭控制的 I2C bus（denial 裡的執行緒名稱
+# 是 excal:LensCtrl），原本落在未分類的通用 device 型別。AOSP
+# system/sepolicy/private/hal_camera.te 已經內建
+# `allow hal_camera camera_device:chr_file rw_file_perms;`，只要把這個節點
+# 標成既有的 camera_device 型別就好，不用另外開新的 allow 規則。
+/dev/i2c-8    u:object_r:camera_device:s0

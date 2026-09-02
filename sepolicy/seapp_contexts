@@ -1,1 +1,2 @@
 user=_app seinfo=platform isPrivApp=true name=com.sonyericsson.android.camera domain=semccamera_app type=privapp_data_file levelFrom=all
+user=_app seinfo=platform name=com.sonymobile.scan3d domain=scan3d_app type=app_data_file levelFrom=user

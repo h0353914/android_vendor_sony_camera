@@ -1,0 +1,79 @@
+# Dedicated domain for the scan3d app (com.sonymobile.scan3d,
+# system/app/app-scan3d-release), built from source (apps/app-scan3d submodule).
+#
+# This app bundles Meta's Fresco/SoLoader (libimagepipeline.so etc.).
+# SoLoader self-extracts its native libraries into the app's own private
+# data dir at runtime and dlopen()s them straight from there, instead of
+# using the APK's own jniLibs — a mechanism AOSP's W^X hardening blocks by
+# design: platform_app.te (system/sepolicy/private/platform_app.te) grants
+# no execute permission on app_data_file, so the stock apk FATAL
+# EXCEPTIONs on first launch:
+#
+#   avc: denied { execute } for path="/data/data/com.sonymobile.scan3d/
+#   lib-main/libimagepipeline.so" scontext=u:r:platform_app:s0:...
+#   tcontext=u:object_r:app_data_file:s0:... tclass=file permissive=0
+#
+#   SoLoader: dlopen failed: couldn't map "...libimagepipeline.so"
+#   segment 0: Permission denied
+#   java.lang.UnsatisfiedLinkError: couldn't find DSO to load:
+#   libimagepipeline.so
+#
+# The apk stays platform-signed and in system/app (not system/priv-app):
+# seapp_contexts resolves domain by seinfo before isPrivApp, so a
+# platform-signed apk lands in platform_app regardless of install path —
+# moving it to priv-app alone would not have picked up priv_app.te's
+# `allow priv_app privapp_data_file:file execute;` without also dropping
+# the platform certificate. A narrow per-app domain with just the one
+# extra permission is the smaller change.
+#
+# Baseline below is the platform_app.te-equivalent set already vetted for
+# this vendor sepolicy context in semccamera_app.te (private/platform-only
+# types and macros — app_api_service, tradeinmode_service, etc. — dropped
+# there after confirming they don't resolve from vendor policy; see that
+# file's header for the full explanation). Reused as-is rather than
+# re-deriving it.
+
+type scan3d_app, domain, coredomain;
+
+app_domain(scan3d_app)
+net_domain(scan3d_app)
+bluetooth_domain(scan3d_app)
+
+allow scan3d_app shell_data_file:dir search;
+allow scan3d_app shell_data_file:file { open getattr read };
+allow scan3d_app media_rw_data_file:dir create_dir_perms;
+allow scan3d_app media_rw_data_file:file create_file_perms;
+allow scan3d_app cache_file:dir create_dir_perms;
+allow scan3d_app cache_file:file create_file_perms;
+allow scan3d_app mnt_media_rw_file:dir r_dir_perms;
+allow scan3d_app sdcard_type:dir create_dir_perms;
+allow scan3d_app sdcard_type:file create_file_perms;
+allow scan3d_app rootfs:dir getattr;
+
+allow scan3d_app audioserver_service:service_manager find;
+allow scan3d_app cameraserver_service:service_manager find;
+allow scan3d_app drmserver_service:service_manager find;
+allow scan3d_app mediaserver_service:service_manager find;
+allow scan3d_app mediametrics_service:service_manager find;
+allow scan3d_app mediaextractor_service:service_manager find;
+allow scan3d_app mediadrmserver_service:service_manager find;
+allow scan3d_app persistent_data_block_service:service_manager find;
+allow scan3d_app radio_service:service_manager find;
+allow scan3d_app thermal_service:service_manager find;
+allow scan3d_app vr_manager_service:service_manager find;
+allow scan3d_app app_api_service:service_manager find;
+allow scan3d_app system_api_service:service_manager find;
+
+binder_call(scan3d_app, statsd)
+
+allow scan3d_app system_server:udp_socket {
+        connect getattr read recvfrom sendto write getopt setopt };
+
+allow scan3d_app app_data_file:lnk_file create_file_perms;
+
+dontaudit scan3d_app debugfs_tracing:file rw_file_perms;
+
+# ─── SoLoader self-extracted native library execution ───
+# The actual reason this domain exists — everything above is just the
+# minimal platform_app-equivalent baseline this app also needs.
+allow scan3d_app app_data_file:file execute;
