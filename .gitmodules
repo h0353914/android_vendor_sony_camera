@@ -1,9 +1,11 @@
 [submodule "cacao"]
 	path = cacao
 	url = https://github.com/h0353914/libcacao.git
+	branch = lineage-22.2
 [submodule "SemcCameraUI"]
 	path = apps/SemcCameraUI
 	url = https://github.com/h0353914/SemcCameraUI-xxhdpi-release
+	branch = java-2.2.2.A.0.15-a15
 [submodule "CameraPanorama"]
 	path = apps/CameraPanorama
 	url = https://github.com/h0353914/CameraPanorama-release
